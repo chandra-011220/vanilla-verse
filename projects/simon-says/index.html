@@ -1,4 +1,4 @@
-<!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -8,6 +8,9 @@
 </head>
 <body>
   <main class="container">
+    <!-- ADD THEME TOGGLE BUTTON HERE -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    
     <h1>Simon Says</h1>
 
     <section class="game">
@@ -30,29 +33,6 @@
         </div>
 
         <div class="options">
-           <!-- TODO: contributors can add toggles for strict mode, difficulty, theme -->
-           <label>
-             <input type="checkbox" id="soundToggle" checked />
-             Sound
-           </label>
-           <label>
-             <input type="checkbox" id="showSequence" checked />
-             Show sequence visually
-           </label>
-           <label>
-             <input type="checkbox" id="strictModeToggle" />
-             Strict Mode
-           </label>
-           <label>
-             Difficulty:
-             <select id="difficultySelect">
-               <option value="easy">Easy</option>
-               <option value="medium" selected>Medium</option>
-               <option value="hard">Hard</option>
-             </select>
-           </label>
-         </div>
-          <!-- TODO: contributors can add toggles for strict mode, difficulty, theme -->
           <label>
             <input type="checkbox" id="soundToggle" checked />
             Sound

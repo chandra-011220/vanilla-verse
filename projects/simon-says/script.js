@@ -1,3 +1,25 @@
+ // Theme toggle functionality - ADD THIS AT THE VERY TOP
+const themeToggle = document.getElementById('themeToggle');
+if (themeToggle) {
+  const savedTheme = localStorage.getItem('simon-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeToggle(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('simon-theme', newTheme);
+    updateThemeToggle(newTheme);
+  });
+
+  function updateThemeToggle(theme) {
+    themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    themeToggle.setAttribute('aria-label', 
+      theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+}
+
 // script.js - Simon Says (Vanilla JS)
 // Core game implemented. Many TODOs included for contributors.
 
@@ -13,7 +35,6 @@ const state = {
   soundEnabled: true,
   showSequenceVisual: true,
   strictMode: false,
-  difficulty: 'medium',
   difficulty: 'normal', // 'easy' | 'normal' | 'hard'
 };
 
@@ -30,8 +51,6 @@ const levelEl = document.getElementById('level');
 const messageEl = document.getElementById('message');
 const soundToggle = document.getElementById('soundToggle');
 const showSequenceToggle = document.getElementById('showSequence');
-const strictModeToggle = document.getElementById('strictModeToggle');
-const difficultySelect = document.getElementById('difficultySelect');
 const strictToggle = document.getElementById('strictToggle');
 const difficultySelect = document.getElementById('difficultySelect');
 const difficultyHintEl = document.getElementById('difficultyHint');
@@ -48,26 +67,9 @@ const TONE_FREQ = {
   blue: 261.63,  // C4
 };
 
-// ---- TODO: Replace / add real audio files here ----
-// Contributors: add preloaded audio file URLs and use `playAudioFile(color)` instead of generated tones.
-const audioFiles = {
-  // green: 'sounds/green.mp3',
-  // red: 'sounds/red.mp3',
-  // yellow: 'sounds/yellow.mp3',
-  // blue: 'sounds/blue.mp3',
-};
-
 // Play audio for color. Falls back to generated tone if file isn't present.
 async function playSound(color, duration = 350) {
   if (!state.soundEnabled) return;
-  // If contributor added audioFiles, use that (TODO: implement file playback)
-  if (audioFiles[color]) {
-    // TODO: implement file playback preloading and play here
-    // Example:
-    // const aud = new Audio(audioFiles[color]);
-    // await aud.play();
-    // For now, fall back to generated tone below.
-  }
 
   // Fallback: WebAudio tone
   ensureAudioCtx();
@@ -94,26 +96,10 @@ function highlightPad(color, ms = 350) {
   setTimeout(() => el.classList.remove('active'), ms);
 }
 
-// Difficulty configurations
-const DIFFICULTY_CONFIG = {
-  easy: { playbackSpeed: 500, gap: 400, showVisual: true },
-  medium: { playbackSpeed: 350, gap: 300, showVisual: true },
-  hard: { playbackSpeed: 200, gap: 200, showVisual: false },
-};
-
 // Play back the current sequence to the player
 async function playbackSequence() {
   state.playingBack = true;
   messageEl.textContent = 'Watch the sequence...';
-  const config = DIFFICULTY_CONFIG[state.difficulty];
-  const gap = config.gap;
-
-  for (let i = 0; i < state.sequence.length; i++) {
-    const color = state.sequence[i];
-    const showVisual = config.showVisual && state.showSequenceVisual;
-    if (showVisual) highlightPad(color, config.playbackSpeed);
-    await playSound(color, config.playbackSpeed);
-    await wait(gap);
   const cfg = getDifficultyConfig();
 
   for (let i = 0; i < state.sequence.length; i++) {
@@ -195,17 +181,8 @@ async function handlePlayerInput(color) {
   } else {
     // wrong
     if (state.strictMode) {
-      messageEl.textContent = 'Wrong! Game over.';
-      state.running = false;
-      // Optionally: vibrate on supported devices
-      try { if (navigator.vibrate) navigator.vibrate(200); } catch (e) {}
-    } else {
-      messageEl.textContent = 'Wrong! Try again.';
-      await wait(800);
-      // Optionally: vibrate on supported devices
       messageEl.textContent = 'Wrong! Game over. Press Start to play again.';
       state.running = false;
-      // Optionally: vibrate on supported devices
       try { if (navigator.vibrate) navigator.vibrate(300); } catch (e) {}
     } else {
       messageEl.textContent = 'Wrong! Try again.';
@@ -259,15 +236,10 @@ soundToggle.addEventListener('change', (e) => {
 showSequenceToggle.addEventListener('change', (e) => {
   state.showSequenceVisual = e.target.checked;
 });
-strictModeToggle.addEventListener('change', (e) => {
+strictToggle.addEventListener('change', (e) => {
   state.strictMode = e.target.checked;
 });
 difficultySelect.addEventListener('change', (e) => {
-  state.difficulty = e.target.value;
-strictToggle?.addEventListener('change', (e) => {
-  state.strictMode = e.target.checked;
-});
-difficultySelect?.addEventListener('change', (e) => {
   state.difficulty = e.target.value;
   applyDifficultySideEffects();
 });
@@ -275,16 +247,6 @@ difficultySelect?.addEventListener('change', (e) => {
 // initial setup
 initPadListeners();
 applyDifficultySideEffects();
-
-// expose some functions for debugging / tests (optional)
-window.__simon = {
-  state,
-  startGame,
-  restartGame,
-  nextRound,
-  addRandomColorToSequence,
-  // TODO: add testing helpers, seedable RNG for deterministic tests
-};
 
 // Difficulty configuration and helpers
 function getDifficultyConfig() {
@@ -320,3 +282,12 @@ function applyDifficultySideEffects() {
     if (difficultyHintEl) difficultyHintEl.textContent = 'Hard plays faster and may reduce visual cues.';
   }
 }
+
+// expose some functions for debugging / tests (optional)
+window.__simon = {
+  state,
+  startGame,
+  restartGame,
+  nextRound,
+  addRandomColorToSequence,
+};
