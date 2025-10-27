@@ -1,3 +1,25 @@
+// Theme toggle functionality
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('whackamole-theme') || 'dark';
+
+// Apply saved theme
+document.documentElement.setAttribute('data-theme', savedTheme);
+updateThemeToggle(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('whackamole-theme', newTheme);
+  updateThemeToggle(newTheme);
+});
+
+function updateThemeToggle(theme) {
+  themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+  themeToggle.setAttribute('aria-label', 
+    theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
 const grid = document.getElementById('grid');
 const scoreEl = document.getElementById('score');
 const timerEl = document.getElementById('timer');
